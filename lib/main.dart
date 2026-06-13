@@ -8,9 +8,9 @@ import 'package:genui/genui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'agent/recipe_backend.dart';
-import 'catalog/recipe_catalog.dart';
-import 'firebase_options.dart';
+import 'package:recipe_genui/agent/recipe_backend.dart';
+import 'package:recipe_genui/catalog/recipe_catalog.dart';
+import 'package:recipe_genui/firebase_options.dart';
 
 /// App identity. Rename here to rebrand the whole app.
 const String kAppName = 'Sage';

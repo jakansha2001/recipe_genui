@@ -1,8 +1,8 @@
 import 'package:genui/genui.dart';
 
-import '../recipe_db.dart';
-import 'recipe_card.dart';
-import 'recipe_view.dart';
+import 'package:recipe_genui/recipe_db.dart';
+import 'package:recipe_genui/catalog/recipe_card.dart';
+import 'package:recipe_genui/catalog/recipe_view.dart';
 
 /// The system-prompt fragments that steer the model: what to do, when, and with
 /// which components. Registering a widget (Step 3) makes it *possible* for the

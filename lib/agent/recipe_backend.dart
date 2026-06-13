@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_ai/firebase_ai.dart' as fb;
 import 'package:genui/genui.dart';
 
-import '../catalog/recipe_catalog.dart';
+import 'package:recipe_genui/catalog/recipe_catalog.dart';
 
 /// Builds the full system instruction string for the model.
 ///

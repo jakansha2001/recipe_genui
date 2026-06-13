@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../recipe_db.dart';
+import 'package:recipe_genui/recipe_db.dart';
 
 /// Tracks which recipe the user last opened, so that card can stay visibly
 /// highlighted across the (persistent) chat history. Shared app-wide because
