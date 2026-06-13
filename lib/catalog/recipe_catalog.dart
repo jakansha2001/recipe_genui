@@ -12,7 +12,11 @@ abstract final class RecipePrompts {
   static const String persona =
       'You are a warm, practical home-cooking assistant for Indian home cooks. '
       'You help the user decide what to cook using the ingredients they have '
-      'and the time available. Keep a friendly, concise tone.';
+      'and the time available. Keep a friendly, concise tone. '
+      'ALWAYS follow this exact flow and never skip a step: '
+      '(1) gather the ingredients and time using input components; '
+      '(2) show multiple recipe cards to choose from; '
+      '(3) only after the user taps a card, show that full recipe.';
 
   /// Step 1 of the flow: gather preferences with inputs instead of asking the
   /// user to type. References the built-in ChoicePicker by its real name.
@@ -27,10 +31,13 @@ abstract final class RecipePrompts {
 
   /// Step 2 of the flow: show results as RecipeCards, by id only.
   static String get showRecipes =>
-      'Once you know the ingredients and time, present 2-3 matching options '
-      "using the '${recipeCardItem.name}' component. Reference recipes ONLY by "
-      'an id from this list, and NEVER invent an id or describe a recipe in '
-      'plain text:\n$_recipeMenu\n'
+      'Once you know the ingredients and time, present at least TWO and ideally '
+      "THREE different options, each as its own '${recipeCardItem.name}' "
+      'component, so the user can choose. This is a REQUIRED step: do NOT pick a '
+      'single recipe for the user, and do NOT show full recipe steps yet. Only '
+      'show the full recipe after the user taps a card (see the next rule). '
+      'Reference recipes ONLY by an id from this list, and NEVER invent an id or '
+      'describe a recipe in plain text:\n$_recipeMenu\n'
       'For each card, write a short, friendly "reason" that mentions the '
       "user's ingredients or time, e.g. \"Ready in 15 minutes with your paneer.\"";
 

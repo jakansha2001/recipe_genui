@@ -157,6 +157,25 @@ class _RecipeCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 14),
+                  // Clear, colored affordance so users know the card opens a
+                  // full recipe. Tapping anywhere on the card also works.
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: onTap,
+                      icon: const Icon(Icons.menu_book_outlined, size: 18),
+                      label: const Text('View recipe'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

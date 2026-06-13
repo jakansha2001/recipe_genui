@@ -35,7 +35,7 @@ String buildRecipeSystemInstruction() {
 /// that calls Gemini (via firebase_ai) and pipes the streamed text back in
 /// through `addChunk`. Swapping providers later means changing only this file.
 class RecipeBackend {
-  RecipeBackend({String modelName = 'gemini-3.5-flash'}) {
+  RecipeBackend({String modelName = 'gemini-3.1-flash-lite'}) {
     _model = fb.FirebaseAI.googleAI().generativeModel(
       model: modelName,
       // No API key here — Firebase AI Logic holds it. The system instruction
