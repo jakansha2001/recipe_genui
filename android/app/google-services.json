@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1081999367489",
+    "project_id": "recipe-genui",
+    "storage_bucket": "recipe-genui.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081999367489:android:cf476248b16c522d27d5c0",
+        "android_client_info": {
+          "package_name": "com.example.recipe_genui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXGV52Qx16yJuWAb0HoXCjjg8lt3A4D9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
