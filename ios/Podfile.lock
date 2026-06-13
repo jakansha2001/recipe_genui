@@ -1,0 +1,162 @@
+PODS:
+  - AppCheckCore (11.3.0):
+    - GoogleUtilities/Environment (~> 8.0)
+    - GoogleUtilities/UserDefaults (~> 8.0)
+    - PromisesObjC (~> 2.4)
+    - PromisesSwift (~> 2.4)
+    - RecaptchaInterop (~> 101.0)
+  - audioplayers_darwin (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - Firebase/Auth (12.14.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (~> 12.14.0)
+  - Firebase/CoreOnly (12.14.0):
+    - FirebaseCore (~> 12.14.0)
+  - firebase_ai (3.12.2):
+    - Flutter
+  - firebase_app_check (0.4.4-2):
+    - Firebase/CoreOnly (~> 12.14.0)
+    - firebase_core
+    - FirebaseAppCheck (~> 12.14.0)
+    - Flutter
+  - firebase_auth (6.5.2):
+    - Firebase/Auth (= 12.14.0)
+    - firebase_core
+    - Flutter
+  - firebase_core (4.10.0):
+    - Firebase/CoreOnly (= 12.14.0)
+    - Flutter
+  - FirebaseAppCheck (12.14.0):
+    - AppCheckCore (~> 11.0)
+    - FirebaseAppCheckInterop (~> 12.14.0)
+    - FirebaseCore (~> 12.14.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/UserDefaults (~> 8.1)
+  - FirebaseAppCheckInterop (12.14.0)
+  - FirebaseAuth (12.14.0):
+    - FirebaseAppCheckInterop (~> 12.14.0)
+    - FirebaseAuthInterop (~> 12.14.0)
+    - FirebaseCore (~> 12.14.0)
+    - FirebaseCoreExtension (~> 12.14.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GTMSessionFetcher/Core (< 6.0, >= 3.4)
+    - RecaptchaInterop (~> 101.0)
+  - FirebaseAuthInterop (12.14.0)
+  - FirebaseCore (12.14.0):
+    - FirebaseCoreInternal (~> 12.14.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/Logger (~> 8.1)
+  - FirebaseCoreExtension (12.14.0):
+    - FirebaseCore (~> 12.14.0)
+  - FirebaseCoreInternal (12.14.0):
+    - "GoogleUtilities/NSData+zlib (~> 8.1)"
+  - Flutter (1.0.0)
+  - GoogleUtilities/AppDelegateSwizzler (8.1.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Environment (8.1.0):
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Logger (8.1.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Network (8.1.0):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Privacy
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (8.1.0)":
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Privacy (8.1.0)
+  - GoogleUtilities/Reachability (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/UserDefaults (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GTMSessionFetcher/Core (5.3.0)
+  - PromisesObjC (2.4.1)
+  - PromisesSwift (2.4.1):
+    - PromisesObjC (= 2.4.1)
+  - RecaptchaInterop (101.0.0)
+  - url_launcher_ios (0.0.1):
+    - Flutter
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/darwin`)
+  - firebase_ai (from `.symlinks/plugins/firebase_ai/ios`)
+  - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
+  - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
+  - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - Flutter (from `Flutter`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
+
+SPEC REPOS:
+  trunk:
+    - AppCheckCore
+    - Firebase
+    - FirebaseAppCheck
+    - FirebaseAppCheckInterop
+    - FirebaseAuth
+    - FirebaseAuthInterop
+    - FirebaseCore
+    - FirebaseCoreExtension
+    - FirebaseCoreInternal
+    - GoogleUtilities
+    - GTMSessionFetcher
+    - PromisesObjC
+    - PromisesSwift
+    - RecaptchaInterop
+
+EXTERNAL SOURCES:
+  audioplayers_darwin:
+    :path: ".symlinks/plugins/audioplayers_darwin/darwin"
+  firebase_ai:
+    :path: ".symlinks/plugins/firebase_ai/ios"
+  firebase_app_check:
+    :path: ".symlinks/plugins/firebase_app_check/ios"
+  firebase_auth:
+    :path: ".symlinks/plugins/firebase_auth/ios"
+  firebase_core:
+    :path: ".symlinks/plugins/firebase_core/ios"
+  Flutter:
+    :path: Flutter
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+  video_player_avfoundation:
+    :path: ".symlinks/plugins/video_player_avfoundation/darwin"
+
+SPEC CHECKSUMS:
+  AppCheckCore: 214137f5c378d1dec88a68425c467fe65aaff637
+  audioplayers_darwin: f15e209a3e856d1a7edcf98dc029f484fead2242
+  Firebase: 7cc10425300768ec86292688af5cb228f0604bde
+  firebase_ai: f8bef2536d620fd8ee16e286f54092b2792c5f6d
+  firebase_app_check: cef54234542ccd7e8471e1eacee99961a6eb8b85
+  firebase_auth: 08d9e2155c59dee7b84db916334a017a1c22633f
+  firebase_core: 059f6939d27b5644ea96ad8ad71a9a6e17db74f1
+  FirebaseAppCheck: 49d593026a7959280816e303fd27a3f732ccb9aa
+  FirebaseAppCheckInterop: f123c0261a7b46f060e98fc2961651f1ac68f384
+  FirebaseAuth: 01a77d472aec77ec008141e7d859d1b9cb8dc2cf
+  FirebaseAuthInterop: 63056ef7f9602e79a8f8d756d4cb35f38e2927c3
+  FirebaseCore: 4939b340b9c598dc1f965d68f8fe57e630b65407
+  FirebaseCoreExtension: ee3e3697acea1062288b1900bcdcab4d59ab93b4
+  FirebaseCoreInternal: 090369a5fffd7423cf88006ab4d2ccc2173a8db9
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  GTMSessionFetcher: 127211aeec0b1e904fc49f4f6f895dcc535b0ecf
+  PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
+  PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
+  RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
+  url_launcher_ios: bb13df5870e8c4234ca12609d04010a21be43dfa
+  video_player_avfoundation: e54d03b3b19f64f2c557354f72ce538387541ba6
+
+PODFILE CHECKSUM: 53a6aebc29ccee84c41f92f409fc20cd4ca011f1
+
+COCOAPODS: 1.16.2
