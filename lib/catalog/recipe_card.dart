@@ -4,6 +4,11 @@ import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../recipe_db.dart';
 
+/// Tracks which recipe the user last opened, so that card can stay visibly
+/// highlighted across the (persistent) chat history. Shared app-wide because
+/// cards live inside model-generated surfaces we don't otherwise control.
+final ValueNotifier<String?> selectedRecipeId = ValueNotifier<String?>(null);
+
 /// A custom catalog item the AI can choose to render a recipe.
 ///
 /// The anatomy of every CatalogItem, all visible here:
@@ -72,7 +77,9 @@ final CatalogItem recipeCardItem = CatalogItem(
       recipe: recipe,
       reason: reason,
       onTap: () {
-        // Closes the loop: tapping asks the model for the full recipe view.
+        // Mark this card as the user's choice so it highlights, then close the
+        // loop: ask the model for the full recipe view.
+        selectedRecipeId.value = recipe.id;
         itemContext.dispatchEvent(
           UserActionEvent(
             name: 'viewRecipe',
@@ -95,93 +102,120 @@ class _RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 2,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image header. Loads a bundled asset; if it's missing we still
-            // look good with a branded fallback (so the demo never shows a
-            // broken-image icon).
-            SizedBox(
-              height: 160,
-              width: double.infinity,
-              child: Image.asset(
-                'assets/recipes/${recipe.image}',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stack) => Container(
-                  color: theme.colorScheme.primaryContainer,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.restaurant_menu,
-                    size: 44,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    recipe.title,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  if (reason != null && reason!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      reason!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+    return ValueListenableBuilder<String?>(
+      valueListenable: selectedRecipeId,
+      builder: (context, selectedId, _) {
+        final selected = selectedId == recipe.id;
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: selected
+                ? BorderSide(color: theme.colorScheme.primary, width: 2.5)
+                : BorderSide.none,
+          ),
+          elevation: selected ? 4 : 2,
+          child: InkWell(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image header loaded from the internet; a branded fallback
+                // keeps the demo clean if a URL ever fails to load.
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: Image.network(
+                    recipe.imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return Container(
+                        color: theme.colorScheme.primaryContainer,
+                        alignment: Alignment.center,
+                        child: const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stack) => Container(
+                      color: theme.colorScheme.primaryContainer,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.restaurant_menu,
+                        size: 44,
+                        color: theme.colorScheme.onPrimaryContainer,
                       ),
                     ),
-                  ],
-                  const SizedBox(height: 12),
-                  Row(
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _MetaChip(
-                        icon: Icons.schedule,
-                        label: '${recipe.cookTimeMinutes} min',
+                      Text(
+                        recipe.title,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 8),
-                      _MetaChip(
-                        icon: Icons.bar_chart,
-                        label: recipe.difficulty,
+                      if (reason != null && reason!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          reason!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          _MetaChip(
+                            icon: Icons.schedule,
+                            label: '${recipe.cookTimeMinutes} min',
+                          ),
+                          const SizedBox(width: 8),
+                          _MetaChip(
+                            icon: Icons.bar_chart,
+                            label: recipe.difficulty,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      // Colored affordance; flips to a "Selected" state once
+                      // chosen so it's obvious which card the user picked.
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: onTap,
+                          icon: Icon(
+                            selected
+                                ? Icons.check_circle
+                                : Icons.menu_book_outlined,
+                            size: 18,
+                          ),
+                          label: Text(selected ? 'Selected' : 'View recipe'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  // Clear, colored affordance so users know the card opens a
-                  // full recipe. Tapping anywhere on the card also works.
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: onTap,
-                      icon: const Icon(Icons.menu_book_outlined, size: 18),
-                      label: const Text('View recipe'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

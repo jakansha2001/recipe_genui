@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -119,6 +120,7 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
   final List<_ChatItem> _items = [];
   final Set<String> _seenSurfaces = {};
   StreamSubscription<ConversationEvent>? _eventsSub;
+  StreamSubscription<ChatMessage>? _submitSub;
 
   ({Uint8List bytes, String mimeType})? _stagedImage;
 
@@ -135,6 +137,57 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
     // surfaces, the model's plain-text replies, AND errors (which the SDK
     // otherwise swallows). Each becomes a transcript entry, in arrival order.
     _eventsSub = _conversation.events.listen(_onEvent);
+
+    // When the user acts on a widget (picks chips + submits, taps a card, taps
+    // an adjust chip), add a right-side bubble echoing their choice — so they
+    // can see what they selected. We do NOT remove the panel: it stays in the
+    // history and remains usable, so they can scroll back and pick again.
+    // (onSubmit is a broadcast stream, so this second listener is safe.)
+    _submitSub = _surfaceController.onSubmit.listen(_onUserSubmit);
+  }
+
+  void _onUserSubmit(ChatMessage message) {
+    final summary = _summarizeInteraction(message);
+    if (summary == null) return; // skip non-informative submits
+    setState(() => _items.add(_ChatItem.user(text: summary)));
+    _scrollToBottom();
+  }
+
+  /// Best-effort, comma-separated summary of what the user selected, pulled from
+  /// the interaction payload's action context. Returns null if there's nothing
+  /// readable to show.
+  String? _summarizeInteraction(ChatMessage message) {
+    for (final part in message.parts) {
+      if (!part.isUiInteractionPart) continue;
+      try {
+        final json = jsonDecode(part.asUiInteractionPart!.interaction)
+            as Map<String, dynamic>;
+        final action = json['action'] as Map<String, dynamic>?;
+        final context = action?['context'] as Map<String, dynamic>?;
+        if (context == null || context.isEmpty) return null;
+
+        if (context['title'] != null) return 'Selected: ${context['title']}';
+        if (context['adjustment'] != null) {
+          return 'Adjust: ${context['adjustment']}';
+        }
+
+        final bits = <String>[];
+        context.forEach((key, value) {
+          if (key.toLowerCase().contains('id')) return;
+          if (value is List) {
+            bits.addAll(value.map((e) => e.toString()));
+          } else if (value is String && value.isNotEmpty) {
+            bits.add(value);
+          } else if (value is num) {
+            bits.add('$value');
+          }
+        });
+        return bits.isEmpty ? null : bits.join(', ');
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
   }
 
   void _onEvent(ConversationEvent event) {
@@ -171,6 +224,7 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
   @override
   void dispose() {
     _eventsSub?.cancel();
+    _submitSub?.cancel();
     _conversation.dispose();
     _backend.dispose();
     _surfaceController.dispose();
@@ -192,6 +246,8 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
   }
 
   Future<void> _send() async {
+    // Don't allow a new request while one is already in flight.
+    if (_conversation.state.value.isWaiting) return;
     final text = _textController.text.trim();
     final staged = _stagedImage;
     if (text.isEmpty && staged == null) return;
@@ -262,16 +318,22 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
             ),
             ValueListenableBuilder<ConversationState>(
               valueListenable: _conversation.state,
-              builder: (context, state, _) => state.isWaiting
-                  ? const _ThinkingRow()
-                  : const SizedBox(height: 4),
-            ),
-            _Composer(
-              textController: _textController,
-              stagedImage: _stagedImage?.bytes,
-              onPickPhoto: _pickFridgePhoto,
-              onClearPhoto: () => setState(() => _stagedImage = null),
-              onSend: _send,
+              builder: (context, state, _) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  state.isWaiting
+                      ? const _ThinkingRow()
+                      : const SizedBox(height: 4),
+                  _Composer(
+                    textController: _textController,
+                    stagedImage: _stagedImage?.bytes,
+                    isBusy: state.isWaiting,
+                    onPickPhoto: _pickFridgePhoto,
+                    onClearPhoto: () => setState(() => _stagedImage = null),
+                    onSend: _send,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -451,6 +513,7 @@ class _Composer extends StatelessWidget {
   const _Composer({
     required this.textController,
     required this.stagedImage,
+    required this.isBusy,
     required this.onPickPhoto,
     required this.onClearPhoto,
     required this.onSend,
@@ -458,6 +521,7 @@ class _Composer extends StatelessWidget {
 
   final TextEditingController textController;
   final Uint8List? stagedImage;
+  final bool isBusy;
   final VoidCallback onPickPhoto;
   final VoidCallback onClearPhoto;
   final VoidCallback onSend;
@@ -499,7 +563,7 @@ class _Composer extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: onPickPhoto,
+                onPressed: isBusy ? null : onPickPhoto,
                 icon: const Icon(Icons.add_a_photo_outlined),
                 color: kSeed,
                 tooltip: 'Add a fridge photo',
@@ -514,8 +578,9 @@ class _Composer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     controller: textController,
-                    decoration: const InputDecoration(
-                      hintText: 'What should I cook?',
+                    enabled: !isBusy,
+                    decoration: InputDecoration(
+                      hintText: isBusy ? 'Thinking...' : 'What should I cook?',
                       border: InputBorder.none,
                     ),
                     onSubmitted: (_) => onSend(),
@@ -524,14 +589,17 @@ class _Composer extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Material(
-                color: kSeed,
+                color: isBusy ? Colors.grey.shade400 : kSeed,
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),
-                  onTap: onSend,
-                  child: const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Icon(Icons.arrow_upward, color: Colors.white),
+                  onTap: isBusy ? null : onSend,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      isBusy ? Icons.stop : Icons.arrow_upward,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

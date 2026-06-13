@@ -57,6 +57,16 @@ abstract final class RecipePrompts {
       "'steps' list reflecting the change and a short 'note' explaining what "
       'you changed. Keep steps safe and realistic.';
 
+  /// The fix for "new UI overwrites old UI": force a unique surface every turn.
+  static String get uniqueSurfaces =>
+      'CRITICAL SURFACE RULE: every time you create a surface you MUST use a '
+      'brand-new, unique surfaceId you have never used before in this '
+      'conversation — increment it every single response (for example "s1", '
+      'then "s2", then "s3", and so on). NEVER reuse an earlier surfaceId. Each '
+      'response MUST create a NEW surface, so the UI you showed earlier (such as '
+      'a previous list of recipe suggestions) stays on screen and is never '
+      'overwritten. This is mandatory.';
+
   /// Honesty about the menu's limits: don't force a bad match.
   static String get offMenu =>
       'You can ONLY suggest recipes from the list above. If the user asks for '
@@ -93,6 +103,7 @@ final Catalog _basicCatalog = BasicCatalogItems.asCatalog().copyWithout(
 /// domain steering prompts layered on top of the basic ones.
 final Catalog recipeCatalog = _basicCatalog.copyWith(
   systemPromptFragments: [
+    RecipePrompts.uniqueSurfaces,
     RecipePrompts.persona,
     RecipePrompts.gatherPreferences,
     RecipePrompts.showRecipes,

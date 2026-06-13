@@ -1,9 +1,11 @@
 /// The recipe "database" — a small, fixed set of facts.
 ///
 /// This is the trusted source from the talk's core principle:
-/// *the model proposes, your data disposes.* The model is only ever allowed to
-/// reference a recipe by its [id]; it can never invent a title, a cook time, or
-/// (critically) an image URL. Everything factual lives here, owned by us.
+/// *the model proposes, your data disposes.* The model only ever references a
+/// recipe by [id]; it can never invent a title, a cook time, or an image. The
+/// images are fetched from the internet by keyword (see [imageUrl]) so you don't
+/// have to bundle any photo files yourself. Swap any URL for a specific one
+/// (e.g. an Unsplash/Pexels link) when you want exact control.
 library;
 
 class Recipe {
@@ -14,7 +16,7 @@ class Recipe {
     required this.difficulty,
     required this.ingredients,
     required this.steps,
-    required this.image,
+    required this.imageUrl,
   });
 
   /// Stable identifier. This is the ONLY field the model sends back to us.
@@ -30,8 +32,10 @@ class Recipe {
   /// but these are the trustworthy default.
   final List<String> steps;
 
-  /// Filename under assets/recipes/. The model never supplies this.
-  final String image;
+  /// A live image URL. We use loremflickr.com, which returns a real photo
+  /// matching the keywords — no API key, no bundled files. The `lock` value
+  /// keeps each recipe's image stable across reloads.
+  final String imageUrl;
 }
 
 /// The fixed catalog of recipes the assistant can choose from.
@@ -49,7 +53,7 @@ const List<Recipe> recipes = [
       'Add the crumbled paneer, toss for 3-4 minutes, and season with salt.',
       'Garnish with coriander and serve hot with roti.',
     ],
-    image: 'paneer_bhurji.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/paneer,indian,food?lock=11',
   ),
   Recipe(
     id: 'tomato_paneer_masala',
@@ -64,7 +68,7 @@ const List<Recipe> recipes = [
       'Add cubed paneer and simmer gently for 5 minutes.',
       'Finish with a swirl of cream and serve with naan.',
     ],
-    image: 'tomato_paneer_masala.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/paneer,curry,indian?lock=12',
   ),
   Recipe(
     id: 'quick_paneer_wrap',
@@ -78,7 +82,7 @@ const List<Recipe> recipes = [
       'Add the paneer, sliced onion and capsicum.',
       'Roll tightly, slice in half, and serve.',
     ],
-    image: 'quick_paneer_wrap.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/wrap,roll,food?lock=13',
   ),
   Recipe(
     id: 'jeera_aloo',
@@ -92,7 +96,7 @@ const List<Recipe> recipes = [
       'Add green chilli and turmeric, then the potatoes.',
       'Toss until the edges crisp, season with salt, and garnish with coriander.',
     ],
-    image: 'jeera_aloo.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/potato,curry,indian?lock=14',
   ),
   Recipe(
     id: 'masala_omelette',
@@ -106,7 +110,7 @@ const List<Recipe> recipes = [
       'Cook until the base sets, then fold and cook through.',
       'Serve with buttered toast.',
     ],
-    image: 'masala_omelette.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/omelette,eggs,food?lock=15',
   ),
   Recipe(
     id: 'dal_tadka',
@@ -120,7 +124,7 @@ const List<Recipe> recipes = [
       'Saute onion and tomato until soft, then add to the dal.',
       'Pour the sizzling tadka over the top just before serving.',
     ],
-    image: 'dal_tadka.jpg',
+    imageUrl: 'https://loremflickr.com/640/400/dal,lentil,indian?lock=16',
   ),
 ];
 

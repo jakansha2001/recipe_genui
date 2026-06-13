@@ -115,9 +115,21 @@ class _RecipeView extends StatelessWidget {
           SizedBox(
             height: 180,
             width: double.infinity,
-            child: Image.asset(
-              'assets/recipes/${recipe.image}',
+            child: Image.network(
+              recipe.imageUrl,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return Container(
+                  color: theme.colorScheme.primaryContainer,
+                  alignment: Alignment.center,
+                  child: const SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              },
               errorBuilder: (context, error, stack) => Container(
                 color: theme.colorScheme.primaryContainer,
                 alignment: Alignment.center,
