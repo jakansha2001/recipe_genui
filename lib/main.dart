@@ -141,6 +141,9 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
     switch (event) {
       case ConversationSurfaceAdded(:final surfaceId):
         if (_seenSurfaces.add(surfaceId)) {
+          // Keep the full transcript — every new surface is appended, nothing
+          // is wiped. (Used interactive panels are collapsed into bubbles by
+          // _onUserSubmit instead.)
           setState(() => _items.add(_ChatItem.surface(surfaceId)));
           _scrollToBottom();
         }

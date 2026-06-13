@@ -2,6 +2,7 @@ import 'package:genui/genui.dart';
 
 import '../recipe_db.dart';
 import 'recipe_card.dart';
+import 'recipe_view.dart';
 
 /// The system-prompt fragments that steer the model: what to do, when, and with
 /// which components. Registering a widget (Step 3) makes it *possible* for the
@@ -16,7 +17,9 @@ abstract final class RecipePrompts {
       'ALWAYS follow this exact flow and never skip a step: '
       '(1) gather the ingredients and time using input components; '
       '(2) show multiple recipe cards to choose from; '
-      '(3) only after the user taps a card, show that full recipe.';
+      '(3) only after the user taps a card, show that full recipe. '
+      'Keep any text outside of components to a single short sentence — let '
+      'the components carry the content, not long paragraphs.';
 
   /// Step 1 of the flow: gather preferences with inputs instead of asking the
   /// user to type. References the built-in ChoicePicker by its real name.
@@ -27,7 +30,9 @@ abstract final class RecipePrompts {
       '"chips", multiple selection) to confirm which ingredients they have, and '
       'another to ask how much time they have. Pre-select ingredients the user '
       'already mentioned or that appear in their photo. Keep it to one short '
-      'surface that ends with a submit button.';
+      'surface that ends with a submit button. The submit button MUST be a '
+      "Button with \"variant\": \"primary\" so it shows as a solid, colored "
+      'call-to-action (not a plain outline).';
 
   /// Step 2 of the flow: show results as RecipeCards, by id only.
   static String get showRecipes =>
@@ -44,10 +49,23 @@ abstract final class RecipePrompts {
   /// Step 3 of the flow: the loop-closing action from tapping a card.
   static String get viewRecipe =>
       "When a 'viewRecipe' action arrives, the user tapped a recipe card. "
-      'Respond by showing that recipe\'s full ingredient list and numbered '
-      'steps using Text components. If the user adds a constraint (for example '
-      '"no blender" or "make it spicier"), adapt the steps sensibly while '
-      'keeping them safe and realistic.';
+      "Respond by showing that recipe using the '${recipeViewItem.name}' "
+      'component (NEVER plain text), referencing the same recipe id. '
+      "When an 'adjustRecipe' action arrives, the user wants a change (the "
+      'adjustment is in the action context, e.g. "no blender"). Re-render the '
+      "'${recipeViewItem.name}' for the SAME recipe id, but pass an adapted "
+      "'steps' list reflecting the change and a short 'note' explaining what "
+      'you changed. Keep steps safe and realistic.';
+
+  /// Honesty about the menu's limits: don't force a bad match.
+  static String get offMenu =>
+      'You can ONLY suggest recipes from the list above. If the user asks for '
+      'something none of those recipes reasonably satisfy (for example a burger, '
+      'pasta, or a cuisine not represented), do NOT force an unrelated recipe. '
+      'Instead, briefly and warmly say you don\'t have that recipe yet, and '
+      'mention what you CAN help with (quick Indian home cooking with paneer, '
+      'eggs, potato, and dal). Only show recipe cards when there is a genuine '
+      'match.';
 
   /// Inject the menu of valid recipe ids straight from our database, so the
   /// model always knows exactly what it's allowed to choose.
@@ -78,8 +96,9 @@ final Catalog recipeCatalog = _basicCatalog.copyWith(
     RecipePrompts.persona,
     RecipePrompts.gatherPreferences,
     RecipePrompts.showRecipes,
+    RecipePrompts.offMenu,
     RecipePrompts.viewRecipe,
     ..._basicCatalog.systemPromptFragments,
   ],
-  newItems: [recipeCardItem],
+  newItems: [recipeCardItem, recipeViewItem],
 );
