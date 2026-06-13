@@ -73,9 +73,9 @@ abstract final class RecipePrompts {
       'something none of those recipes reasonably satisfy (for example a burger, '
       'pasta, or a cuisine not represented), do NOT force an unrelated recipe. '
       'Instead, briefly and warmly say you don\'t have that recipe yet, and '
-      'mention what you CAN help with (quick Indian home cooking with paneer, '
-      'eggs, potato, and dal). Only show recipe cards when there is a genuine '
-      'match.';
+      'mention what you CAN help with (quick Indian home cooking — paneer, egg, '
+      'chicken, lentil and bean dishes, rice, vegetables, and breakfast items). '
+      'Only show recipe cards when there is a genuine match.';
 
   /// Inject the menu of valid recipe ids straight from our database, so the
   /// model always knows exactly what it's allowed to choose.

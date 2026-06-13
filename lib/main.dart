@@ -13,29 +13,41 @@ import 'catalog/recipe_catalog.dart';
 import 'firebase_options.dart';
 
 /// App identity. Rename here to rebrand the whole app.
-const String kAppName = 'Rasoi';
+const String kAppName = 'Sage';
 const String kAppTagline = 'Cook with what you have';
 
-// Warm, appetizing palette — a real recipe app, not a tech demo.
-const Color kSeed = Color(0xFF2F7A4F); // fresh herb green
-const Color kCream = Color(0xFFFBF8F1); // warm paper background
-const Color kInk = Color(0xFF26241F); // soft charcoal text
+// Fresh, modern palette — emerald green with a green -> teal gradient.
+const Color kSeed = Color(0xFF12B76A); // fresh emerald (primary)
+const Color kAccent = Color(0xFF0E9488); // deep teal (accent)
+const Color kCream = Color(0xFFF5FAF7); // soft mint-white background
+const Color kInk = Color(0xFF18261F); // deep green-charcoal text
+
+/// Green -> teal gradient used on the wordmark and the send button.
+const List<Color> kBrandGradient = [
+  Color(0xFF2BD46F), // fresh green
+  Color(0xFF0E9488), // teal
+];
+const LinearGradient kBrandLinearGradient = LinearGradient(
+  colors: kBrandGradient,
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const RasoiApp());
+  runApp(const SageApp());
 }
 
-class RasoiApp extends StatelessWidget {
-  const RasoiApp({super.key});
+class SageApp extends StatelessWidget {
+  const SageApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.fromSeed(
       seedColor: kSeed,
       brightness: Brightness.light,
-    ).copyWith(surface: kCream);
+    ).copyWith(surface: kCream, secondary: kAccent);
 
     final baseText = GoogleFonts.interTextTheme().apply(
       bodyColor: kInk,
@@ -64,7 +76,7 @@ class RasoiApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const RasoiHomePage(),
+      home: const SageHomePage(),
     );
   }
 }
@@ -100,14 +112,14 @@ class _ChatItem {
   final String? surfaceId;
 }
 
-class RasoiHomePage extends StatefulWidget {
-  const RasoiHomePage({super.key});
+class SageHomePage extends StatefulWidget {
+  const SageHomePage({super.key});
 
   @override
-  State<RasoiHomePage> createState() => _RasoiHomePageState();
+  State<SageHomePage> createState() => _SageHomePageState();
 }
 
-class _RasoiHomePageState extends State<RasoiHomePage> {
+class _SageHomePageState extends State<SageHomePage> {
   late final SurfaceController _surfaceController;
   late final RecipeBackend _backend;
   late final Conversation _conversation;
@@ -285,18 +297,24 @@ class _RasoiHomePageState extends State<RasoiHomePage> {
         title: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              kAppName,
-              style: GoogleFonts.fraunces(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: kSeed,
+            ShaderMask(
+              shaderCallback: (bounds) =>
+                  kBrandLinearGradient.createShader(bounds),
+              child: Text(
+                kAppName,
+                style: GoogleFonts.outfit(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                  color: Colors.white, // painted over by the gradient shader
+                ),
               ),
             ),
             Text(
               kAppTagline,
               style: GoogleFonts.inter(
                 fontSize: 11,
+                fontWeight: FontWeight.w500,
                 color: kInk.withValues(alpha: 0.55),
               ),
             ),
@@ -450,20 +468,21 @@ class _EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: kSeed.withValues(alpha: 0.1),
+              width: 80,
+              height: 80,
+              decoration: const BoxDecoration(
+                gradient: kBrandLinearGradient,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.restaurant, size: 34, color: kSeed),
+              child: const Icon(Icons.restaurant_menu,
+                  size: 38, color: Colors.white),
             ),
             const SizedBox(height: 20),
             Text(
               'What should we cook?',
-              style: GoogleFonts.fraunces(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
                 color: kInk,
               ),
             ),
@@ -579,6 +598,7 @@ class _Composer extends StatelessWidget {
                   child: TextField(
                     controller: textController,
                     enabled: !isBusy,
+                    textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       hintText: isBusy ? 'Thinking...' : 'What should I cook?',
                       border: InputBorder.none,
@@ -588,17 +608,24 @@ class _Composer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Material(
-                color: isBusy ? Colors.grey.shade400 : kSeed,
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: isBusy ? null : onSend,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Icon(
-                      isBusy ? Icons.stop : Icons.arrow_upward,
-                      color: Colors.white,
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: isBusy ? null : kBrandLinearGradient,
+                  color: isBusy ? Colors.grey.shade400 : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: isBusy ? null : onSend,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Icon(
+                        isBusy ? Icons.stop : Icons.arrow_upward,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
