@@ -1,11 +1,11 @@
 {
-    "name": "recipe_genui",
-    "short_name": "recipe_genui",
+    "name": "Sage",
+    "short_name": "Sage",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Sage — a Generative UI cooking assistant built with the Flutter GenUI SDK.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
