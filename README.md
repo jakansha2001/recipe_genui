@@ -8,7 +8,7 @@ Tell it *"something quick with paneer"* and it builds the UI: chips to confirm w
 
 Built with the experimental [**Flutter GenUI SDK**](https://docs.flutter.dev/ai/genui), the open [**A2UI**](https://a2ui.org/) (Agent‑to‑User Interface) protocol, and **Gemini** via Firebase AI Logic.
 
-> 📊 This repo also contains the companion conference talk deck: [`genui-talk.html`](genui-talk.html) — *"Building Generative Interfaces with Flutter's GenUI SDK."*
+> 📊 **Talk slides:** this app is the live demo for the conference talk *"Building Generative Interfaces with Flutter's GenUI SDK"* — [**view the deck ↗**](https://akanshajain.dev/talks/genui/)
 
 ---
 
@@ -138,6 +138,7 @@ The `genui` package is **experimental / alpha** — the API still changes betwee
 - [Official GenUI codelab](https://codelabs.developers.google.com/codelabs/genui-intro)
 - [A2UI — the protocol](https://a2ui.org/) · [Google's announcement](https://developers.googleblog.com/introducing-a2ui-an-open-project-for-agent-driven-interfaces/)
 - [Flutter + A2UI = GenUI (Flutter team video)](https://www.youtube.com/watch?v=tXeyaV1gVJk)
+- [📊 Talk slides — "Building Generative Interfaces with Flutter's GenUI SDK"](https://akanshajain.dev/talks/genui/)
 
 ---
 
