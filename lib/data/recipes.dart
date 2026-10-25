@@ -1,52 +1,31 @@
-/// The recipe "database" — a small, fixed set of facts.
-///
-/// This is the trusted source from the talk's core principle:
-/// *the model proposes, your data disposes.* The model only ever references a
-/// recipe by [id]; it can never invent a title, a cook time, or an image. The
-/// images are fetched from the internet by keyword (see [imageUrl]) so you don't
-/// have to bundle any photo files yourself. Swap any URL for a specific one
-/// (e.g. an Unsplash/Pexels link) when you want exact control.
+/// The recipe "database" — a small, fixed set of facts the model can point at.
 library;
 
-class Recipe {
-  const Recipe({
-    required this.id,
-    required this.title,
-    required this.cookTimeMinutes,
-    required this.difficulty,
-    required this.ingredients,
-    required this.steps,
-    required this.imageUrl,
-  });
+import 'package:recipe_genui/data/recipe.dart';
 
-  /// Stable identifier. This is the ONLY field the model sends back to us.
-  final String id;
-  final String title;
-  final int cookTimeMinutes;
+/// Look up a recipe by id, or null if the model referenced one we don't have
+/// (which the widgets handle visibly).
+Recipe? recipeById(String id) => _recipesById[id];
 
-  /// One of: easy, medium, hard.
-  final String difficulty;
-  final List<String> ingredients;
+final Map<String, Recipe> _recipesById = {for (final r in recipes) r.id: r};
 
-  /// Canonical steps. The model may *adapt* these (e.g. drop a blender step),
-  /// but these are the trustworthy default.
-  final List<String> steps;
-
-  /// A live image URL. We use loremflickr.com, which returns a real photo
-  /// matching the keywords — no API key, no bundled files. The `lock` value
-  /// keeps each recipe's image stable across reloads.
-  final String imageUrl;
-}
-
-/// The fixed catalog of recipes the assistant can choose from.
+/// The fixed list of recipes the assistant can choose from.
 const List<Recipe> recipes = [
   // ---- Paneer ----
   Recipe(
     id: 'paneer_bhurji',
     title: 'Paneer Bhurji',
     cookTimeMinutes: 15,
-    difficulty: 'easy',
-    ingredients: ['paneer', 'onion', 'tomato', 'green chilli', 'turmeric', 'cumin'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('paneer', 200, Unit.gram),
+      Ingredient('onion', 1),
+      Ingredient('tomato', 1),
+      Ingredient('green chilli', 1),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+      Ingredient('cumin seeds', 1, Unit.teaspoon),
+    ],
     steps: [
       'Crumble the paneer with your hands and set aside.',
       'Heat oil, add cumin, then saute onion until soft.',
@@ -54,14 +33,22 @@ const List<Recipe> recipes = [
       'Add the crumbled paneer, toss for 3-4 minutes, and season with salt.',
       'Garnish with coriander and serve hot with roti.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/paneer,indian,food?lock=11',
   ),
   Recipe(
     id: 'tomato_paneer_masala',
     title: 'Tomato Paneer Masala',
     cookTimeMinutes: 20,
-    difficulty: 'medium',
-    ingredients: ['paneer', 'tomato', 'onion', 'ginger', 'garlic', 'cream', 'garam masala'],
+    difficulty: Difficulty.medium,
+    servings: 2,
+    ingredients: [
+      Ingredient('paneer', 200, Unit.gram),
+      Ingredient('tomato', 2),
+      Ingredient('onion', 1),
+      Ingredient('ginger, grated', 1, Unit.teaspoon),
+      Ingredient('garlic cloves', 3),
+      Ingredient('cream', 2, Unit.tablespoon),
+      Ingredient('garam masala', 0.5, Unit.teaspoon),
+    ],
     steps: [
       'Blend tomato, onion, ginger and garlic into a smooth puree.',
       'Cook the puree in oil until it thickens and darkens, about 8 minutes.',
@@ -69,21 +56,26 @@ const List<Recipe> recipes = [
       'Add cubed paneer and simmer gently for 5 minutes.',
       'Finish with a swirl of cream and serve with naan.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/paneer,curry,indian?lock=12',
   ),
   Recipe(
     id: 'quick_paneer_wrap',
     title: 'Quick Paneer Wrap',
     cookTimeMinutes: 10,
-    difficulty: 'easy',
-    ingredients: ['paneer', 'roti', 'onion', 'capsicum', 'mint chutney'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('paneer', 150, Unit.gram),
+      Ingredient('roti', 2),
+      Ingredient('onion', 0.5),
+      Ingredient('capsicum', 0.5),
+      Ingredient('mint chutney', 2, Unit.tablespoon),
+    ],
     steps: [
       'Pan-fry paneer strips with a pinch of chaat masala until golden.',
       'Warm a roti and spread mint chutney across it.',
       'Add the paneer, sliced onion and capsicum.',
       'Roll tightly, slice in half, and serve.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/wrap,roll,food?lock=13',
   ),
 
   // ---- Potato & vegetables ----
@@ -91,43 +83,64 @@ const List<Recipe> recipes = [
     id: 'jeera_aloo',
     title: 'Jeera Aloo',
     cookTimeMinutes: 20,
-    difficulty: 'easy',
-    ingredients: ['potato', 'cumin', 'green chilli', 'turmeric', 'coriander'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('potato', 3),
+      Ingredient('cumin seeds', 1, Unit.teaspoon),
+      Ingredient('green chilli', 1),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+      Ingredient('coriander, chopped', 2, Unit.tablespoon),
+    ],
     steps: [
       'Boil potatoes until just tender, then cube them.',
       'Temper cumin in hot oil until fragrant.',
       'Add green chilli and turmeric, then the potatoes.',
       'Toss until the edges crisp, season with salt, and garnish with coriander.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/potato,curry,indian?lock=14',
   ),
   Recipe(
     id: 'aloo_gobi',
     title: 'Aloo Gobi',
     cookTimeMinutes: 25,
-    difficulty: 'easy',
-    ingredients: ['potato', 'cauliflower', 'onion', 'tomato', 'turmeric', 'cumin', 'ginger'],
+    difficulty: Difficulty.easy,
+    servings: 3,
+    ingredients: [
+      Ingredient('potato', 2),
+      Ingredient('cauliflower', 0.5),
+      Ingredient('onion', 1),
+      Ingredient('tomato', 1),
+      Ingredient('turmeric', 0.5, Unit.teaspoon),
+      Ingredient('cumin seeds', 1, Unit.teaspoon),
+      Ingredient('ginger, grated', 1, Unit.teaspoon),
+    ],
     steps: [
       'Heat oil and temper cumin; add onion and ginger until soft.',
       'Add tomato and turmeric and cook to a paste.',
       'Add potato and cauliflower florets, coat well, and add a splash of water.',
       'Cover and cook on low until tender, then garnish with coriander.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/cauliflower,potato,indian?lock=15',
   ),
   Recipe(
     id: 'bhindi_masala',
     title: 'Bhindi Masala',
     cookTimeMinutes: 20,
-    difficulty: 'easy',
-    ingredients: ['okra', 'onion', 'tomato', 'turmeric', 'coriander powder', 'amchur'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('okra', 250, Unit.gram),
+      Ingredient('onion', 1),
+      Ingredient('tomato', 1),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+      Ingredient('coriander powder', 1, Unit.teaspoon),
+      Ingredient('amchur', 0.5, Unit.teaspoon),
+    ],
     steps: [
       'Wash and fully dry the okra, then slice into pieces.',
       'Saute the okra in oil until it loses its stickiness, then set aside.',
       'In the same pan cook onion and tomato with the spices.',
       'Return the okra, toss, finish with amchur, and serve with roti.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/okra,indian,food?lock=16',
   ),
 
   // ---- Lentils & beans ----
@@ -135,43 +148,65 @@ const List<Recipe> recipes = [
     id: 'dal_tadka',
     title: 'Dal Tadka',
     cookTimeMinutes: 30,
-    difficulty: 'medium',
-    ingredients: ['toor dal', 'onion', 'tomato', 'garlic', 'cumin', 'red chilli'],
+    difficulty: Difficulty.medium,
+    servings: 4,
+    ingredients: [
+      Ingredient('toor dal', 1, Unit.cup),
+      Ingredient('onion', 1),
+      Ingredient('tomato', 1),
+      Ingredient('garlic cloves', 4),
+      Ingredient('cumin seeds', 1, Unit.teaspoon),
+      Ingredient('dried red chilli', 2),
+    ],
     steps: [
       'Pressure-cook the dal with turmeric and salt until soft.',
       'Prepare a tadka: fry cumin, garlic and red chilli in ghee.',
       'Saute onion and tomato until soft, then add to the dal.',
       'Pour the sizzling tadka over the top just before serving.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/dal,lentil,indian?lock=17',
   ),
   Recipe(
     id: 'chana_masala',
     title: 'Chana Masala',
     cookTimeMinutes: 30,
-    difficulty: 'medium',
-    ingredients: ['chickpeas', 'onion', 'tomato', 'ginger', 'garlic', 'garam masala', 'chana masala powder'],
+    difficulty: Difficulty.medium,
+    servings: 4,
+    ingredients: [
+      Ingredient('boiled chickpeas', 400, Unit.gram),
+      Ingredient('onion', 2),
+      Ingredient('tomato', 2),
+      Ingredient('ginger, grated', 1, Unit.teaspoon),
+      Ingredient('garlic cloves', 4),
+      Ingredient('garam masala', 1, Unit.teaspoon),
+      Ingredient('chana masala powder', 1, Unit.tablespoon),
+    ],
     steps: [
       'Saute onion, ginger and garlic until golden.',
       'Add tomato and the spices; cook to a thick masala.',
       'Add boiled chickpeas with a little of their water.',
       'Simmer 10 minutes until thick, then finish with garam masala.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/chickpea,curry,indian?lock=18',
   ),
   Recipe(
     id: 'rajma',
     title: 'Rajma Masala',
     cookTimeMinutes: 40,
-    difficulty: 'medium',
-    ingredients: ['kidney beans', 'onion', 'tomato', 'ginger', 'garlic', 'garam masala'],
+    difficulty: Difficulty.medium,
+    servings: 4,
+    ingredients: [
+      Ingredient('dried kidney beans', 1, Unit.cup),
+      Ingredient('onion', 2),
+      Ingredient('tomato', 2),
+      Ingredient('ginger, grated', 1, Unit.teaspoon),
+      Ingredient('garlic cloves', 4),
+      Ingredient('garam masala', 1, Unit.teaspoon),
+    ],
     steps: [
       'Soak kidney beans overnight, then pressure-cook until very soft.',
       'Make a masala by frying onion, ginger, garlic and tomato with spices.',
       'Add the beans with their cooking liquid and simmer until thick.',
       'Lightly mash a few beans for body and serve with rice.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/beans,curry,indian?lock=19',
   ),
 
   // ---- Rice ----
@@ -179,43 +214,62 @@ const List<Recipe> recipes = [
     id: 'veg_pulao',
     title: 'Vegetable Pulao',
     cookTimeMinutes: 25,
-    difficulty: 'medium',
-    ingredients: ['basmati rice', 'mixed vegetables', 'onion', 'whole spices', 'ginger garlic paste'],
+    difficulty: Difficulty.medium,
+    servings: 3,
+    ingredients: [
+      Ingredient('basmati rice', 1, Unit.cup),
+      Ingredient('mixed vegetables', 1, Unit.cup),
+      Ingredient('onion', 1),
+      Ingredient('whole spices', 1, Unit.tablespoon),
+      Ingredient('ginger garlic paste', 1, Unit.teaspoon),
+    ],
     steps: [
       'Rinse and soak the rice for 15 minutes.',
       'Fry whole spices and onion, then add ginger garlic paste and vegetables.',
       'Add the drained rice and water (1 cup rice to about 1.75 cups water).',
       'Cover and cook on low until done, then rest 5 minutes and fluff.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/pulao,rice,indian?lock=20',
   ),
   Recipe(
     id: 'lemon_rice',
     title: 'Lemon Rice',
     cookTimeMinutes: 15,
-    difficulty: 'easy',
-    ingredients: ['cooked rice', 'lemon', 'peanuts', 'mustard seeds', 'curry leaves', 'turmeric'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('cooked rice', 2, Unit.cup),
+      Ingredient('lemon', 1),
+      Ingredient('peanuts', 2, Unit.tablespoon),
+      Ingredient('mustard seeds', 1, Unit.teaspoon),
+      Ingredient('curry leaves', 10),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+    ],
     steps: [
       'Temper mustard seeds, peanuts and curry leaves in oil.',
       'Add turmeric, then the cooked rice, and toss to coat.',
       'Turn off the heat and squeeze in fresh lemon juice.',
       'Mix gently, season with salt, and serve.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/rice,south,indian?lock=21',
   ),
   Recipe(
     id: 'veg_fried_rice',
     title: 'Veg Fried Rice',
     cookTimeMinutes: 15,
-    difficulty: 'easy',
-    ingredients: ['cooked rice', 'mixed vegetables', 'spring onion', 'soy sauce', 'garlic'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('cooked rice', 2, Unit.cup),
+      Ingredient('mixed vegetables', 1, Unit.cup),
+      Ingredient('spring onion', 2),
+      Ingredient('soy sauce', 1, Unit.tablespoon),
+      Ingredient('garlic cloves', 3),
+    ],
     steps: [
       'Heat oil on high; fry garlic and finely chopped vegetables fast.',
       'Add the cold cooked rice and toss on high heat.',
       'Splash in soy sauce and season.',
       'Finish with spring onion and serve hot.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/fried,rice,vegetable?lock=22',
   ),
 
   // ---- Eggs ----
@@ -223,29 +277,42 @@ const List<Recipe> recipes = [
     id: 'masala_omelette',
     title: 'Masala Omelette',
     cookTimeMinutes: 8,
-    difficulty: 'easy',
-    ingredients: ['eggs', 'onion', 'tomato', 'green chilli', 'coriander'],
+    difficulty: Difficulty.easy,
+    servings: 1,
+    ingredients: [
+      Ingredient('eggs', 2),
+      Ingredient('onion', 0.5),
+      Ingredient('tomato', 0.5),
+      Ingredient('green chilli', 1),
+      Ingredient('coriander, chopped', 1, Unit.tablespoon),
+    ],
     steps: [
       'Whisk eggs with chopped onion, tomato, chilli, coriander and salt.',
       'Pour into a hot, lightly oiled pan.',
       'Cook until the base sets, then fold and cook through.',
       'Serve with buttered toast.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/omelette,eggs,food?lock=23',
   ),
   Recipe(
     id: 'egg_curry',
     title: 'Egg Curry',
     cookTimeMinutes: 30,
-    difficulty: 'medium',
-    ingredients: ['eggs', 'onion', 'tomato', 'ginger garlic paste', 'garam masala', 'turmeric'],
+    difficulty: Difficulty.medium,
+    servings: 2,
+    ingredients: [
+      Ingredient('eggs', 4),
+      Ingredient('onion', 2),
+      Ingredient('tomato', 2),
+      Ingredient('ginger garlic paste', 1, Unit.tablespoon),
+      Ingredient('garam masala', 1, Unit.teaspoon),
+      Ingredient('turmeric', 0.5, Unit.teaspoon),
+    ],
     steps: [
       'Boil and peel the eggs, then lightly fry them with a little turmeric.',
       'Make an onion-tomato masala with ginger garlic paste and spices.',
       'Add water to make a gravy and simmer.',
       'Slip in the eggs, simmer 5 minutes, and serve with rice.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/egg,curry,indian?lock=24',
   ),
 
   // ---- Chicken ----
@@ -253,15 +320,22 @@ const List<Recipe> recipes = [
     id: 'chicken_curry',
     title: 'Home-Style Chicken Curry',
     cookTimeMinutes: 40,
-    difficulty: 'medium',
-    ingredients: ['chicken', 'onion', 'tomato', 'ginger garlic paste', 'yogurt', 'garam masala'],
+    difficulty: Difficulty.medium,
+    servings: 4,
+    ingredients: [
+      Ingredient('chicken', 500, Unit.gram),
+      Ingredient('onion', 2),
+      Ingredient('tomato', 2),
+      Ingredient('ginger garlic paste', 1, Unit.tablespoon),
+      Ingredient('yogurt', 0.5, Unit.cup),
+      Ingredient('garam masala', 1, Unit.teaspoon),
+    ],
     steps: [
       'Brown the chicken pieces and set aside.',
       'Fry onion until deep golden, add ginger garlic paste and tomato.',
       'Add yogurt and spices, then return the chicken with water.',
       'Cover and simmer until tender, then finish with garam masala.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/chicken,curry,indian?lock=25',
   ),
 
   // ---- Breakfast ----
@@ -269,43 +343,65 @@ const List<Recipe> recipes = [
     id: 'poha',
     title: 'Poha',
     cookTimeMinutes: 15,
-    difficulty: 'easy',
-    ingredients: ['flattened rice', 'onion', 'peanuts', 'mustard seeds', 'curry leaves', 'turmeric', 'lemon'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('flattened rice', 1.5, Unit.cup),
+      Ingredient('onion', 1),
+      Ingredient('peanuts', 2, Unit.tablespoon),
+      Ingredient('mustard seeds', 1, Unit.teaspoon),
+      Ingredient('curry leaves', 8),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+      Ingredient('lemon', 0.5),
+    ],
     steps: [
       'Rinse the flattened rice briefly so it softens but stays separate.',
       'Temper mustard seeds, peanuts and curry leaves; add onion and turmeric.',
       'Fold in the poha and warm through gently.',
       'Finish with lemon juice and coriander.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/poha,indian,breakfast?lock=26',
   ),
   Recipe(
     id: 'upma',
     title: 'Upma',
     cookTimeMinutes: 20,
-    difficulty: 'easy',
-    ingredients: ['semolina', 'onion', 'mustard seeds', 'curry leaves', 'green chilli', 'ginger'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('semolina', 1, Unit.cup),
+      Ingredient('onion', 1),
+      Ingredient('mustard seeds', 1, Unit.teaspoon),
+      Ingredient('curry leaves', 8),
+      Ingredient('green chilli', 1),
+      Ingredient('ginger, grated', 1, Unit.teaspoon),
+    ],
     steps: [
       'Dry-roast the semolina until fragrant and set aside.',
       'Temper mustard seeds, curry leaves, chilli, ginger and onion.',
       'Add hot water (about 1 part semolina to 2.5 parts water) and salt.',
       'Stir in the semolina slowly to avoid lumps; cook until fluffy.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/upma,indian,breakfast?lock=27',
   ),
   Recipe(
     id: 'besan_chilla',
     title: 'Besan Chilla',
     cookTimeMinutes: 15,
-    difficulty: 'easy',
-    ingredients: ['gram flour', 'onion', 'tomato', 'green chilli', 'coriander', 'turmeric'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('gram flour', 1, Unit.cup),
+      Ingredient('onion', 1),
+      Ingredient('tomato', 1),
+      Ingredient('green chilli', 1),
+      Ingredient('coriander, chopped', 2, Unit.tablespoon),
+      Ingredient('turmeric', 0.25, Unit.teaspoon),
+    ],
     steps: [
       'Whisk gram flour with water into a smooth, pourable batter.',
       'Stir in chopped onion, tomato, chilli, coriander, turmeric and salt.',
       'Pour onto a hot pan and spread into a thin pancake.',
       'Cook both sides until golden and serve with chutney.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/savory,pancake,indian?lock=28',
   ),
 
   // ---- Quick & relatable ----
@@ -313,37 +409,42 @@ const List<Recipe> recipes = [
     id: 'masala_maggi',
     title: 'Masala Maggi',
     cookTimeMinutes: 10,
-    difficulty: 'easy',
-    ingredients: ['instant noodles', 'onion', 'tomato', 'peas', 'green chilli'],
+    difficulty: Difficulty.easy,
+    servings: 1,
+    ingredients: [
+      Ingredient('instant noodle packs', 1),
+      Ingredient('onion', 0.5),
+      Ingredient('tomato', 0.5),
+      Ingredient('peas', 2, Unit.tablespoon),
+      Ingredient('green chilli', 1),
+    ],
     steps: [
       'Saute onion, tomato, peas and chilli for a couple of minutes.',
       'Add water and bring to a boil.',
       'Add the noodles and the tastemaker and cook 2-3 minutes.',
       'Cook to your preferred consistency and serve hot.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/instant,noodles,food?lock=29',
   ),
   Recipe(
     id: 'grilled_sandwich',
     title: 'Grilled Veg Sandwich',
     cookTimeMinutes: 10,
-    difficulty: 'easy',
-    ingredients: ['bread', 'potato', 'onion', 'tomato', 'cucumber', 'green chutney', 'butter'],
+    difficulty: Difficulty.easy,
+    servings: 2,
+    ingredients: [
+      Ingredient('bread slices', 4),
+      Ingredient('boiled potato', 1),
+      Ingredient('onion', 0.5),
+      Ingredient('tomato', 1),
+      Ingredient('cucumber', 0.5),
+      Ingredient('green chutney', 2, Unit.tablespoon),
+      Ingredient('butter', 1, Unit.tablespoon),
+    ],
     steps: [
       'Butter the bread and spread green chutney inside.',
       'Layer sliced boiled potato, onion, tomato and cucumber; season.',
       'Close the sandwich and grill until crisp and golden.',
       'Slice diagonally and serve with ketchup.',
     ],
-    imageUrl: 'https://loremflickr.com/640/400/grilled,sandwich,food?lock=30',
   ),
 ];
-
-/// Look up a recipe by id. Returns null if the model references one that
-/// doesn't exist (which we handle gracefully in the widget).
-Recipe? recipeById(String id) {
-  for (final r in recipes) {
-    if (r.id == id) return r;
-  }
-  return null;
-}
